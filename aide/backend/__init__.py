@@ -5,7 +5,7 @@ from .utils import FunctionSpec, OutputType, PromptType, compile_prompt_to_md
 def query(
     system_message: PromptType | None,
     user_message: PromptType | None,
-    model: str,
+    model: str = "gpt-4o",
     temperature: float | None = None,
     max_tokens: int | None = None,
     func_spec: FunctionSpec | None = None,
@@ -26,7 +26,6 @@ def query(
     Returns:
         OutputType: A string completion if func_spec is None, otherwise a dict with the function call details.
     """
-
     model_kwargs = model_kwargs | {
         "model": model,
         "temperature": temperature,
