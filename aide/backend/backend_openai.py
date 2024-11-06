@@ -6,23 +6,26 @@ import time
 
 from .utils import FunctionSpec, OutputType, opt_messages_to_list, backoff_create
 from funcy import notnone, once, select_values
-import openai
+from azure.identity import DefaultAzureCredential
+from azure.ai.openai import AzureOpenAIClient
+# import openai
 
 logger = logging.getLogger("aide")
 
-_client: openai.OpenAI = None  # type: ignore
+_client: AzureOpenAIClient = None  # type: ignore
 
-OPENAI_TIMEOUT_EXCEPTIONS = (
-    openai.RateLimitError,
-    openai.APIConnectionError,
-    openai.APITimeoutError,
-    openai.InternalServerError,
+AZURE_OPENAI_TIMEOUT_EXCEPTIONS = (
+    AzureOpenAIClient.RateLimitError,
+    AzureOpenAIClient.APIConnectionError,
+    AzureOpenAIClient.APITimeoutError,
+    AzureOpenAIClient.InternalServerError,
 )
 
 @once
-def _setup_openai_client():
+def _setup_azure_openai_client():
     global _client
-    _client = openai.OpenAI(max_retries=0)
+    credential = DefaultAzureCredential()  # 使用默认凭证
+    _client = AzureOpenAIClient(credential=credential, max_retries=0)
 
 def query(
     system_message: str | None,
@@ -30,7 +33,7 @@ def query(
     func_spec: FunctionSpec | None = None,
     **model_kwargs,
 ) -> tuple[OutputType, float, int, int, dict]:
-    _setup_openai_client()
+    _setup_azure_openai_client()
     filtered_kwargs: dict = select_values(notnone, model_kwargs)  # type: ignore
 
     messages = opt_messages_to_list(system_message, user_message)
@@ -43,7 +46,7 @@ def query(
     t0 = time.time()
     completion = backoff_create(
         _client.chat.completions.create,
-        OPENAI_TIMEOUT_EXCEPTIONS,
+        AZURE_OPENAI_TIMEOUT_EXCEPTIONS,
         messages=messages,
         **filtered_kwargs,
     )

@@ -21,6 +21,10 @@ coolname>=2.2.0
 igraph>=0.11.3
 genson>=1.2.0
 
+azure-ai-formrecognizer==3.3.3
+azure-common==1.1.28
+azure-core==1.32.0
+
 # agent requirements (packages that the agent might need)
 torch
 torchvision
