@@ -6,26 +6,29 @@ import time
 
 from .utils import FunctionSpec, OutputType, opt_messages_to_list, backoff_create
 from funcy import notnone, once, select_values
-from azure.identity import DefaultAzureCredential
-from azure.ai.openai import AzureOpenAIClient
-# import openai
+
+try:
+    from azure.identity import DefaultAzureCredential, get_bearer_token_provider
+except ImportError:
+    print("azure.identity is not installed.")
+
+import openai
 
 logger = logging.getLogger("aide")
 
-_client: AzureOpenAIClient = None  # type: ignore
+_client: openai.AzureOpenAI = None  # type: ignore
 
-AZURE_OPENAI_TIMEOUT_EXCEPTIONS = (
-    AzureOpenAIClient.RateLimitError,
-    AzureOpenAIClient.APIConnectionError,
-    AzureOpenAIClient.APITimeoutError,
-    AzureOpenAIClient.InternalServerError,
+OPENAI_TIMEOUT_EXCEPTIONS = (
+    openai.RateLimitError,
+    openai.APIConnectionError,
+    openai.APITimeoutError,
+    openai.InternalServerError,
 )
 
 @once
-def _setup_azure_openai_client():
+def _setup_openai_client():
     global _client
-    credential = DefaultAzureCredential()  # 使用默认凭证
-    _client = AzureOpenAIClient(credential=credential, max_retries=0)
+    _client = openai.AzureOpenAI(max_retries=0)
 
 def query(
     system_message: str | None,
@@ -33,7 +36,7 @@ def query(
     func_spec: FunctionSpec | None = None,
     **model_kwargs,
 ) -> tuple[OutputType, float, int, int, dict]:
-    _setup_azure_openai_client()
+    _setup_openai_client()
     filtered_kwargs: dict = select_values(notnone, model_kwargs)  # type: ignore
 
     messages = opt_messages_to_list(system_message, user_message)
@@ -46,7 +49,7 @@ def query(
     t0 = time.time()
     completion = backoff_create(
         _client.chat.completions.create,
-        AZURE_OPENAI_TIMEOUT_EXCEPTIONS,
+        OPENAI_TIMEOUT_EXCEPTIONS,
         messages=messages,
         **filtered_kwargs,
     )
