@@ -24,6 +24,8 @@ genson>=1.2.0
 azure-ai-formrecognizer==3.3.3
 azure-common==1.1.28
 azure-core==1.32.0
+azure-storage-blob 
+azure-identity
 
 # agent requirements (packages that the agent might need)
 torch
