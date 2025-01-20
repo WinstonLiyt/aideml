@@ -364,6 +364,14 @@ class Agent:
                 logger.info(
                     f"Actually, node {result_node.id} did not produce a submission.csv"
                 )
+            else:
+                # save the best submission.csv to best_submission/submission.csv
+                best_submission_dir_all = self.cfg.workspace_dir / "best_submission" / f"submission_{self.current_step}.csv"
+                best_submission_dir_all.parent.mkdir(exist_ok=True, parents=True)
+                shutil.copy(
+                    self.cfg.workspace_dir / "submission" / "submission.csv",
+                    best_submission_dir_all
+                )
         self.journal.append(result_node)
 
         # if the result_node is the best node, cache its submission.csv and solution.py

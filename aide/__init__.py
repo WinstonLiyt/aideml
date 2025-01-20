@@ -17,19 +17,21 @@ class Solution:
 
 class Experiment:
 
-    def __init__(self, data_dir: str, goal: str, eval: str | None = None):
+    def __init__(self, data_dir: str, goal: str, eval: str | None = None, node_path: str | None = None):
         """Initialize a new experiment run.
 
         Args:
             data_dir (str): Path to the directory containing the data files.
             goal (str): Description of the goal of the task.
             eval (str | None, optional): Optional description of the preferred way for the agent to evaluate its solutions.
+            node_path (str | None, optional): Path to the directory where the agent workspace will be created. Defaults to None.
         """
         
         _cfg = _load_cfg(use_cli_args=False)
         _cfg.data_dir = data_dir
         _cfg.goal = goal
         _cfg.eval = eval
+        _cfg.node_path = node_path
         self.cfg = prep_cfg(_cfg)
 
         self.task_desc = load_task_desc(self.cfg)

@@ -77,6 +77,7 @@ class Config(Hashable):
     copy_data: bool
 
     exp_name: str
+    node_path: str | None
 
     exec: ExecConfig
     agent: AgentConfig

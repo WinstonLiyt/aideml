@@ -6,6 +6,7 @@ desc_file: null
 # or provide the task goal (and optionally evaluation information) as arguments
 goal: null
 eval: null
+node_path: null
 
 log_dir: logs
 log_level: INFO
